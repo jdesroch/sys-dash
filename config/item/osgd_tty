@@ -1,0 +1,81 @@
+######################################
+#
+#   System Check: osgd_tty
+#   Author: desroches
+#   Created: 20150914
+#
+#   Date    Change
+#   ----    ------
+#
+#
+######################################
+
+osgd_tty_title() {
+    echo "OSGD /dev/tty"
+}
+
+# Positive integer of how much history is kept in cache
+osgd_tty_historySize() {
+    echo 0
+}
+
+# Space separated list of zones that should pass this check
+osgd_tty_zones() {
+    echo "ngz2 ngz5"
+}
+
+osgd_tty_tags() {
+    echo "osgd remote-access file permission"
+}
+
+osgd_tty_check() {
+    zone=$1
+    # *DO NOT* make changes to the system
+    
+    ######################################
+    # Run commands to check status and set INDICATOR if problem found
+    
+    ls -l /dev/tty | grep "crw-rw-rw" > /dev/null
+    if [ $? -ne 0 ]
+    then
+        echo "Incorrect permissions\n`ls -l /dev/tty`"
+        return 2
+    fi
+    
+    ls -l /dev/tty | grep "root tty" > /dev/null
+      if [ $? -ne 0 ]
+    then
+        echo "Incorrect owners\n`ls -l /dev/tty`"
+        return 2
+    fi
+
+    echo "Permissions and owner are correct"
+    return 0
+}
+
+osgd_tty_description() {
+    echo "List permissions and owner of /dev/tty"
+}
+
+osgd_tty_commands() {
+    echo "ls -l /dev/tty"
+}
+
+# Problems that may occur in the output
+osgd_tty_indicators() {
+    echo "Expected output:\ncrw-rw-rw root tty 22, 0 Jul 12 13:22 tty"    
+}
+
+osgd_tty_fixMethod() {
+    echo "TODO:..."
+}
+
+osgd_tty_hasAutoFix() {
+    #TODO if possible define and return 0
+    return 1
+}
+
+osgd_tty_autoFix() {
+    #TODO if possible define and remove return 1
+    return 1
+}
