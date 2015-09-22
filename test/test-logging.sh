@@ -3,6 +3,14 @@
 . `dirname $0`/test.env
 #. $LIB_DIR/logging.sh
 
+# Because this is testing logging settings and may 
+# clobber other tests ensure other tests don't use 
+# the default LOG_DIR
+LOG_LEVEL=
+LOG_FILE=
+LOG_DIR=
+. $LIB_DIR/logging.sh
+
 test-logging_reset() {
     if [ ! -z "$LOG_DIR" ]; then
         rm -rf $LOG_DIR
@@ -27,11 +35,11 @@ test_logLevelWarn() {
     grep INFO $(log_path) > /dev/null; infoResult=$?
     grep WARN $(log_path) > /dev/null; warnResult=$?
     grep ERROR $(log_path) > /dev/null; errorResult=$?
-    assert "$traceResult -ne 0 \
+    assert "[ $traceResult -ne 0 \
         -a $debugResult -ne 0 \
         -a $infoResult -ne 0 \
         -a $warnResult -eq 0 \
-        -a $errorResult -eq 0" \
+        -a $errorResult -eq 0 ]" \
         "Only LOG_LEVEL=$LOG_LEVEL and above are logged"
 }
 
@@ -48,11 +56,11 @@ test_logLevelInfo() {
     grep INFO $(log_path) > /dev/null; infoResult=$?
     grep WARN $(log_path) > /dev/null; warnResult=$?
     grep ERROR $(log_path) > /dev/null; errorResult=$?
-    assert "$traceResult -ne 0 \
+    assert "[ $traceResult -ne 0 \
         -a $debugResult -ne 0 \
         -a $infoResult -eq 0 \
         -a $warnResult -eq 0 \
-        -a $errorResult -eq 0" \
+        -a $errorResult -eq 0 ]" \
         "Only LOG_LEVEL=$LOG_LEVEL and above are logged"
 }
 
@@ -69,11 +77,11 @@ test_logLevelAll() {
     grep INFO $(log_path) > /dev/null; infoResult=$?
     grep WARN $(log_path) > /dev/null; warnResult=$?
     grep ERROR $(log_path) > /dev/null; errorResult=$?
-    assert "$traceResult -eq 0 \
+    assert "[ $traceResult -eq 0 \
         -a $debugResult -eq 0 \
         -a $infoResult -eq 0 \
         -a $warnResult -eq 0 \
-        -a $errorResult -eq 0" \
+        -a $errorResult -eq 0 ]" \
         "Only LOG_LEVEL=$LOG_LEVEL and above are logged"
 }
 
@@ -90,11 +98,11 @@ test_logLevelOff() {
     grep -s INFO $(log_path) > /dev/null; infoResult=$?
     grep -s WARN $(log_path) > /dev/null; warnResult=$?
     grep -s ERROR $(log_path) > /dev/null; errorResult=$?
-    assert "$traceResult -ne 0 \
+    assert "[ $traceResult -ne 0 \
         -a $debugResult -ne 0 \
         -a $infoResult -ne 0 \
         -a $warnResult -ne 0 \
-        -a $errorResult -ne 0" \
+        -a $errorResult -ne 0 ]" \
         "Only LOG_LEVEL=$LOG_LEVEL and above are logged"
 }
 
@@ -104,29 +112,29 @@ test_logLevelDefault() {
     log_info "Logged"
     grep DEBUG $(log_path) > /dev/null; debugResult=$?
     grep INFO $(log_path) > /dev/null; infoResult=$?
-    assert "$debugResult -ne 0 \
-        -a $infoResult -eq 0" \
+    assert "[ $debugResult -ne 0 \
+        -a $infoResult -eq 0 ]" \
         "Only LOG_LEVEL=$LOG_LEVEL and above are logged"
 }
 
 test_clear() {
     log_info "TEST"
     log_clear
-    assert "! -s $(log_path)" "Log file is empty"
+    assert "[ ! -s $(log_path) ]" "Log file is empty"
 }
 
 # Archiving logged
 test_archive() {
     log_info "TEST TO ARCHIVE"
     log_archive
-    assert "$(ls $LOG_DIR/*.log.* | wc -l) -eq 1" "Found archive file"
+    assert "[ $(ls $LOG_DIR/*.log.* | wc -l) -eq 1 ]" "Found archive file"
 }
 
 # Archiving and zipping log
 test_archiveGzip() {
     log_info "TEST TO ARCHIVE"
     log_archive gzip
-    assert "$(ls $LOG_DIR/*.log.*.gz | wc -l) -eq 1" "Found zipped archive file"
+    assert "[ $(ls $LOG_DIR/*.log.*.gz | wc -l) -eq 1 ]" "Found zipped archive file"
 }
 
 # Custom log directory
@@ -139,10 +147,10 @@ test_logDirDefault() {
     sleep 1
     log_info "TEST TO ARCHIVE GZIP"
     log_archive gzip
-    assert "$(ls $(dirname $0)/log | wc -l) -eq 3" ""
+    assert "[ $(ls $(dirname $0)/log | wc -l) -eq 3 ]" "Archive and gzip"
     log_clear
     log_deleteArchives
-    assert "$(ls $(dirname $0)/log | wc -l) -eq 1" ""
+    assert "[ $(ls $(dirname $0)/log | wc -l) -eq 1 ]" "Delete archives"
 }
 
 # Custom log directory
@@ -157,10 +165,10 @@ test_logDirSetBefore() {
     sleep 1
     log_info "TEST TO ARCHIVE GZIP"
     log_archive gzip
-    assert "$(ls $TMP_DIR | wc -l) -eq 3"
+    assert "[ $(ls $TMP_DIR | wc -l) -eq 3 ]" "Archive and gzip"
     log_clear
     log_deleteArchives
-    assert "$(ls $TMP_DIR | wc -l) -eq 1"
+    assert "[ $(ls $TMP_DIR | wc -l) -eq 1 ]" "Delete archives"
 }
 
 # Custom log directory
@@ -175,10 +183,10 @@ test_logDirSetAfter() {
     sleep 1
     log_info "TEST TO ARCHIVE GZIP"
     log_archive gzip
-    assert "$(ls $TMP_DIR | wc -l) -eq 3" "$TMP_DIR has 3 files" 
+    assert "[ $(ls $TMP_DIR | wc -l) -eq 3 ]" "$TMP_DIR has 3 files" 
     log_clear
     log_deleteArchives
-    assert "$(ls $TMP_DIR | wc -l) -eq 1" "$TMP_DIR has 1 file"
+    assert "[ $(ls $TMP_DIR | wc -l) -eq 1 ]" "$TMP_DIR has 1 file"
 }
 
 #reset

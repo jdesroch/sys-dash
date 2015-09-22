@@ -2,7 +2,7 @@ assert() {
     TEST=$1
     MSG=$2
     shift
-    if [ $TEST ]; 
+    if $TEST
     then
         echo "$(basename $0):${FUNCNAME[1]} PASSED: $MSG"
     else
