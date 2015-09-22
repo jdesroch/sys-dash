@@ -16,11 +16,10 @@ disk_usage_fail_title() {
 
 # Positive integer of how much history is kept in cache
 disk_usage_fail_historySize() {
-    echo 
+    echo 0
 }
 
 disk_usage_fail_zones() {
-    #TODO: echo a space separated list of zones
     echo "global ngz1 ngz2 ngz4"
 }
 
@@ -33,12 +32,13 @@ disk_usage_fail_tags() {
 # Reutrn 2 for fail
 disk_usage_fail_check() {
     # *DO NOT* make changes to the system
-    
+    zone=$1
     ######################################
     # Run commands using "xc <zone> <command>"
     # to check status of the given container/zone
     
-    CNT=$($(xc $zone df -h) | egrep '100%|[7-9][0-9]%' | wc -l)
+    CNT=$(xc $zone df -h | egrep '100%|[5-9][0-9]%' | wc -l)
+
     if [ $CNT -gt 0 ]
     then
         echo $"File System(s) above 50% :\n`df -h | egrep '100%|[5-9][0-9]%'`"

@@ -10,30 +10,33 @@ if [ -z "$ITEM_DIR" ]; then
 fi
 
 # Execution within a container (Zone, LXC, etc.)
-# This should be used within items' check method
-# global container represents the host OS (Solaris global zone)
+# The 'xc' function should be used within items' check method
+# 'global' container represents the host OS (Solaris global zone)
 HOST=global
 kernel=$(uname -s)
 # isStarted <zone>
 isStarted() {
     xc $1 ls > /dev/null 2>&1
+    return $?
 }
 #xc <zone> <command>
 xc() {
-    set -x
-    container=$1; shift
+    zone=$1; shift
     command=$@
-    if [ "$container" = "$HOST" ]
+    if [ "$zone" = "$HOST" ]
     then # Run command directly
         $@
+        return $?
     else
         case $kernel in
-            "Linux") sudo lxc-attach -n $container -- $command ;;
-            "SunOS") zlogin $container "$command" ;;
+            "Linux") sudo lxc-attach -n $zone -- $command 
+                ;;
+            "SunOS") zlogin $zone "$command"
+                ;;
             *) return 1 ;;
         esac
+        
     fi
-    set +x
 }
 
 item_isValid() {
@@ -86,9 +89,11 @@ item_check() {
     zone=$2
     if isStarted $zone
     then
+log_debug "$zone is started"
         item_run $item check $zone
     else
-        echo "Zone is not available"
+log_warn "$zone is not available"
+        echo "$zone is not available"
         return 1 
     fi
 }

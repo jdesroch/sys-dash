@@ -39,13 +39,13 @@ disk_usage_pass_check() {
     # Run commands using "xc <zone> <command>"
     # to check status of the given container/zone
     
-    CNT=$($(xc $zone df -h) | egrep '100%|[9][0-9]%' | wc -l)
+    CNT=$(xc $zone df -h | egrep '100%|[9][9]%' | wc -l)
     if [ $CNT -gt 0 ]
     then
-        echo $"File System(s) above 60%:\n\t`df -h | egrep '100%|[9][0-9]%'`"
+        echo $"File System(s) above 99%:\n\t`df -h | egrep '100%|[9][9]%'`"
         return 2
     else
-        echo "All file systems are below 90%"
+        echo "All file systems are below 99%"
         return 0
     fi
     
