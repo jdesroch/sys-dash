@@ -1,6 +1,6 @@
 ######################################
 #
-#   System Check: disk_usage_70
+#   System Check: disk_usage_fail
 #   Author: jody
 #   Created: 20150908
 #
@@ -10,71 +10,72 @@
 #
 ######################################
 
-disk_usage_70_title() {
-    echo "disk_usage_70"
+disk_usage_fail_title() {
+    echo "disk_usage_fail"
 }
 
 # Positive integer of how much history is kept in cache
-disk_usage_70_historySize() {
+disk_usage_fail_historySize() {
     echo 
 }
 
-disk_usage_70_zones() {
+disk_usage_fail_zones() {
     #TODO: echo a space separated list of zones
-    echo "global ngz2 ngz4"
+    echo "global ngz1 ngz2 ngz4"
 }
 
-disk_usage_70_tags() {
+disk_usage_fail_tags() {
     echo "stats filesystem"
 }
 
 # Any output shoud be echoed
 # Return 0 for pass 
 # Reutrn 2 for fail
-disk_usage_70_check() {
+disk_usage_fail_check() {
     # *DO NOT* make changes to the system
     
     ######################################
-    # Run commands to check status and set INDICATOR if problem found
+    # Run commands using "xc <zone> <command>"
+    # to check status of the given container/zone
     
-    CNT=`df -h | egrep '100%|[7-9][0-9]%' | wc -l`
+    CNT=$($(xc $zone df -h) | egrep '100%|[7-9][0-9]%' | wc -l)
     if [ $CNT -gt 0 ]
     then
-        echo $"File System(s) above 70% :\n`df -h | egrep '100%|[7-9][0-9]%'`"
+        echo $"File System(s) above 50% :\n`df -h | egrep '100%|[5-9][0-9]%'`"
         return 2
     else
-        echo "All file systems are below 70%"
+        echo "All file systems are below 50%"
         return 0
     fi
     
     ######################################
 }
 
-disk_usage_70_description() {
+disk_usage_fail_description() {
     echo "TODO: What is being checked"
 }
 
 # Commands that are run during check
 # Help admins reproduce the output
-disk_usage_70_commands() {
+disk_usage_fail_commands() {
     echo "TODO: Commands that are run"
 }
 
 # Problems that may occur in the output
-disk_usage_70_indicators() {
+disk_usage_fail_indicators() {
     echo "TODO: What to check for in output"    
 }
 
-disk_usage_70_fixMethod() {
+disk_usage_fail_fixMethod() {
     echo "TODO:..."
 }
 
-disk_usage_70_hasAutoFix() {
+disk_usage_fail_hasAutoFix() {
     #TODO if possible define and return 0
     return 1
 }
 
-disk_usage_70_autoFix() {
+disk_usage_fail_autoFix() {
     #TODO if possible define and remove return 1
     return 1
 }

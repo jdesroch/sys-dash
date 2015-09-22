@@ -1,6 +1,6 @@
 ######################################
 #
-#   System Check: disk_usage
+#   System Check: disk_usage_pass
 #   Author: jody
 #   Created: 20150908
 #
@@ -10,20 +10,20 @@
 #
 ######################################
 
-disk_usage_title(){
-    echo "disk_usage"
+disk_usage_pass_title(){
+    echo "disk_usage_pass"
 }
 
 # Positive integer of how much history is kept in cache
-disk_usage_historySize(){
+disk_usage_pass_historySize(){
     echo 3
 }
 
-disk_usage_zones() {
+disk_usage_pass_zones() {
     echo "global ngz1 ngz3"
 }
 
-disk_usage_tags() {
+disk_usage_pass_tags() {
     echo "stats filesystem"
 }
 
@@ -31,50 +31,52 @@ disk_usage_tags() {
 # Return 0 for pass 
 # Reutrn 2 for fail
 # All other values will report error
-disk_usage_check() {
+disk_usage_pass_check() {
+    zone=$1
     # *DO NOT* make changes to the system
     
     ######################################
-    # Run commands to check status and set INDICATOR if problem found
+    # Run commands using "xc <zone> <command>"
+    # to check status of the given container/zone
     
-    CNT=`df -h | egrep '100%|[6-9][0-9]%' | wc -l`
+    CNT=$($(xc $zone df -h) | egrep '100%|[9][0-9]%' | wc -l)
     if [ $CNT -gt 0 ]
     then
-        echo $"File System(s) above 60%:\n\t`df -h | egrep '100%|[6-9][0-9]%'`"
+        echo $"File System(s) above 60%:\n\t`df -h | egrep '100%|[9][0-9]%'`"
         return 2
     else
-        echo "All file systems are below 60%"
+        echo "All file systems are below 90%"
         return 0
     fi
     
     ######################################
 }
 
-disk_usage_description() {
+disk_usage_pass_description() {
     echo "List filesystems and grep for percentages above 60%"
 }
 
 # Commands that are run during check
 # Help admins reproduce the output
-disk_usage_commands() {
+disk_usage_pass_commands() {
     echo "df -h | egrep '100%|[6-9][0-9]%'"
 }
 
 # Problems that may occur in the output
-disk_usage_indicators() {
+disk_usage_pass_indicators() {
     echo "TODO: What to check for in output"    
 }
 
-disk_usage_fixMethod() {
+disk_usage_pass_fixMethod() {
     echo "TODO:..."
 }
 
-disk_usage_hasAutoFix() {
+disk_usage_pass_hasAutoFix() {
     #TODO if possible define and return 0
     return 1
 }
 
-disk_usage_autoFix() {
+disk_usage_pass_autoFix() {
     #TODO if possible define and remove return 1
     return 1
 }

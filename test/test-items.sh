@@ -8,6 +8,8 @@ test-items_reset() {
    . $LIB_DIR/sd-items.sh
 }
 
-test_tester() {
-    assert "$(echo $ITEM_LIST | wc -w) -eq 3" "Three items"
+test_itemcheckGlobal() {
+    res_out=$(item_check disk_usage_pass global)
+    res_code=$?
+    assert "$res_code -eq 0" "$res_out"
 }

@@ -21,7 +21,7 @@ osgd_tty_historySize() {
 
 # Space separated list of zones that should pass this check
 osgd_tty_zones() {
-    echo "ngz2 ngz5"
+    echo "global ngz1 ngz2 ngz5"
 }
 
 osgd_tty_tags() {
@@ -33,16 +33,17 @@ osgd_tty_check() {
     # *DO NOT* make changes to the system
     
     ######################################
-    # Run commands to check status and set INDICATOR if problem found
+    # Run commands using "xc <zone> <command>"
+    # to check status of the given container/zone
     
-    ls -l /dev/tty | grep "crw-rw-rw" > /dev/null
+    xc $zone "ls -l /dev/tty" | grep "crw-rw-rw" > /dev/null
     if [ $? -ne 0 ]
     then
         echo "Incorrect permissions\n`ls -l /dev/tty`"
         return 2
     fi
     
-    ls -l /dev/tty | grep "root tty" > /dev/null
+    xc $zone "ls -l /dev/tty" | grep "root tty" > /dev/null
       if [ $? -ne 0 ]
     then
         echo "Incorrect owners\n`ls -l /dev/tty`"
