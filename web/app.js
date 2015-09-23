@@ -120,11 +120,17 @@ var view = {
                         addClass(cell, status);
                         cell.itemID = item.ID;
                         cell.zone = result.zone;
-                        cell.addEventListener("click", view.Detail.show);
+                        cell.addEventListener("click", view.ZoneTab.onResultClick);
                     }
                 }
             }
             view.ZoneTab.root.appendChild(table);
+            
+        },
+        onResultClick: function(event)  {
+            localStorage.setItem("selectedItemID", event.target.itemID);
+            localStorage.setItem("selectedZone", event.target.zone);
+            view.Detail.showSelected();
         }
     },
     FunctionalTab: {
@@ -135,33 +141,33 @@ var view = {
     Detail: {
         textarea: document.getElementById("detail-text-area"),
         init: function() {
-            view.Detail.textarea.addEventListener("input", 
-                function(){
-                    view.textarea.style    
-                }, false);
             view.Detail.reset();
+            view.Detail.showSelected();
         },
         setText: function(text) {
             view.Detail.textarea.innerHTML = text;
         },
-        show: function(event) {
-            var item = data.getItem(event.target.itemID),
-                result = data.getResultByZone(item, event.target.zone),
-                text = "",
-                prop;
-            text += "Item:";
-            for (prop in item){
-                //if(prop === "title" || prop === "cmd")
-                    text += "\n\t" + prop + ":\t" + item[prop];
+        showSelected: function() {
+            var itemID = localStorage.getItem("selectedItemID");
+            var zone = localStorage.getItem("selectedZone");
+            if( itemID && zone ){
+                var item = data.getItem(itemID),
+                    result = data.getResultByZone(item, zone),
+                    text = "",
+                    prop;
+                text += "Item:";
+                for (prop in item){
+                        text += "\n\t" + prop + ":\t" + item[prop];
+                }
+                text += "\nResult:";
+                for (prop in result){
+                    if(prop != "itemID")
+                        text += "\n\t" + prop + ":\t" + result[prop];
+                }
+                view.Detail.textarea.innerHTML = text;
+                view.Detail.textarea.rows = text.split(/\r\n|\r|\n/).length;
+                show(view.Detail.textarea);
             }
-            text += "\nResult:";
-            for (prop in result){
-                if(prop != "itemID")
-                    text += "\n\t" + prop + ":\t" + result[prop];
-            }
-            view.Detail.textarea.innerHTML = text;
-            view.Detail.textarea.rows = text.split(/\r\n|\r|\n/).length;
-            show(view.Detail.textarea);
         },
         reset: function() {
             view.Detail.setText("");
