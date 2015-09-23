@@ -1,6 +1,5 @@
 #!/usr/bin/ksh
-
-. `dirname $0`/sys-dash.env
+. $(dirname $0)/../config/sys-dash.env 
  
 showMainMenu(){
     while true

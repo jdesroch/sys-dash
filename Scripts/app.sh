@@ -1,5 +1,5 @@
 #!/bin/bash
-. $(dirname $0)/sys-dash.env 
+. $(dirname $0)/../config/sys-dash.env 
 
 usage() {
     SCRIPT=$(basename $0)

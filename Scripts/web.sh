@@ -11,7 +11,7 @@ then
     exit 1
 fi
 
-. `dirname $0`/sys-dash.env
+. $(dirname $0)/../config/sys-dash.env 
 
 data_updateAll
 log_info "Item data updated"
