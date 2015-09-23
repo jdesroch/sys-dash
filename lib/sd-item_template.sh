@@ -33,10 +33,14 @@
 # Echo appropriate output
 # return 0 (pass) or 2 (fail)
 <item_name>_check() {
-    # Expected zone to be checked
+    # Zone/container to be checked
     zone=$1
     # *DO NOT* make changes to the system
-    # Run commands to check status
+    # Run commands using "xc <zone> <command>"
+    # to check status of the given container/zone
+    
+    #TODO xc $zone ...
+    
     # Echo useful output and return 0 or 2
     echo "TODO: Fail state output"
     return 2

@@ -1,0 +1,86 @@
+######################################
+#
+#   System Check: application_fake_file
+#   Author: jody
+#   Created: 20150923
+#
+#   Date    Change
+#   ----    ------
+#
+#
+######################################
+
+application_fake_file_title() {
+    echo "Fake App Exists"
+}
+
+# Non-negative integer of how much history is kept
+application_fake_file_historySize() {
+    echo 0
+}
+
+# Space separated list of local zones (Solaris VMs) that should pass this check
+application_fake_file_zones() {
+    echo "global ngz1 ngz2"
+}
+
+# Space separated list of tags to be used for organizing item views
+application_fake_file_tags() {
+    echo "fake application"
+}
+
+# Run checks and validate results
+# Echo appropriate output
+# return 0 (pass) or 2 (fail)
+application_fake_file_check() {
+    # Zone/container to be checked
+    zone=$1
+    # *DO NOT* make changes to the system
+    # Run commands using "xc <zone> <command>"
+    # to check status of the given container/zone
+    
+    CNT=$(xc $zone ls / | grep test_application | wc -l)
+log_trace "CNT=$CNT"
+    res=$?
+log_trace "res=$res"
+    
+    # Echo useful output and return 0 or 2
+    if [ $CNT -ge 1 ]
+    then
+        echo "Fake app file is there!!!"
+        return 0
+    else
+        echo "test_application file not found"
+        return 2
+    fi
+}
+
+application_fake_file_description() {
+    echo "Checking for an application file on root"
+}
+
+# Commands that are run during check
+# Help admins reproduce the output
+application_fake_file_commands() {
+    echo "ls / | grep test_application"
+}
+
+# Problems that may occur in the output
+application_fake_file_indicators() {
+    echo "No output from grep is a problem"    
+}
+
+# Potential fix actions
+application_fake_file_fixMethod() {
+    echo "Use touch to make the file as sudo or root"
+}
+
+application_fake_file_hasAutoFix() {
+    #TODO if possible define and return 0
+    return 1
+}
+
+application_fake_file_autoFix() {
+    #TODO if possible define and remove return 1
+    return 1
+}

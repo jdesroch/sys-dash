@@ -1,7 +1,7 @@
 TYPE	COMPONENT	DESCRIPTION
 NEW	Web Config	Make a web launch to open browser to appropriate URL
 REFACT	Item Scripts	Consolidate item functions into single script - some of this is done - item creation not done
-NEW	Web Config	Deployment file that configures crontab
+NEW	Web Config	Deployment file that configures crontab - add to and complete app.sh functionality
 VERIFY	Command Exec	Verify container checks on Solaris zones
 ONGOING	Tests		Create tests for results, web and any new features
 NEW	Web view	Collapsable tree view of items based on item ID - level0_level1_levelN_item - Status of collapsed items represented by parent

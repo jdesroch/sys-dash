@@ -11,7 +11,7 @@
 ######################################
 
 osgd_tty_title() {
-    echo "OSGD /dev/tty"
+    echo "OSGD TTY Perms"
 }
 
 # Positive integer of how much history is kept in cache
@@ -21,7 +21,7 @@ osgd_tty_historySize() {
 
 # Space separated list of zones that should pass this check
 osgd_tty_zones() {
-    echo "global ngz1 ngz2 ngz5"
+    echo "ngz1 ngz2 ngz5"
 }
 
 osgd_tty_tags() {
