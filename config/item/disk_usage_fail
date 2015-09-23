@@ -11,7 +11,7 @@
 ######################################
 
 disk_usage_fail_title() {
-    echo "disk_usage_fail"
+    echo "Disk Usage (Test Fail)"
 }
 
 # Positive integer of how much history is kept in cache

@@ -1,5 +1,5 @@
 #!/usr/bin/ksh
-. `dirname $0`/../lib/sys-dash.env 
+. $(dirname $0)/sys-dash.env 
 #TODO: Make this part of an item.sh script with other stuf
 usage() {
     echo "Usage: `basename $0` -i <new_item_name> -c <creator>"

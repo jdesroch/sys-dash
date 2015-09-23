@@ -11,7 +11,7 @@
 ######################################
 
 disk_usage_pass_title(){
-    echo "disk_usage_pass"
+    echo "Disk Usage (Test Pass)"
 }
 
 # Positive integer of how much history is kept in cache
