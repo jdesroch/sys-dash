@@ -35,14 +35,22 @@ var data = {
         }
         return taItems;
     },
-    getResultByZone: function(item, zone) {
+    getResultByZone: function(item, zoneName) {
         var r, rlen = data.results.length, result;
         for(r=0;r<rlen;r++){
             result = data.results[r];
-            if(item.ID === result.itemID && result.zone === zone)
+            if(item.ID === result.itemID && result.zone === zoneName)
                 return result;
         }
         return null;
+    },
+    getZoneStatus: function(zoneName){
+        var z, zlen = data.zones.length, zone;
+        for(z=0; z<data.zones.length; z++){
+            if(data.zones[z].name == zoneName){
+                return data.zones[z].status;
+            }
+        }
     }
 };
 
@@ -96,10 +104,14 @@ var view = {
             var hrow = header.insertRow(0);
             insertHeaderCell(hrow, "Item Name", "header");
             var z, zlen = data.zones.length,
-                zone;
+                zone, zoneCells = [];
             for (z = 0; z < zlen; z++) {
                 zone = data.zones[z];
-                insertHeaderCell(hrow, zone, "header");
+                zheader = insertHeaderCell(hrow, zone.name, "header");
+                zheader.id = zone.name;
+                addClass(zheader, zone.status);
+                addClass(zheader, "has-details");
+                zheader.addEventListener("click", view.ZoneTab.onZoneClick);
             }
             // One row per item
             var i, ilen = data.items.length,
@@ -109,16 +121,17 @@ var view = {
                 row = table.insertRow(i + 1);
                 row.insertCell(0).innerHTML = item.title;
                 for (z = 0; z < zlen; z++) {
-                    zone = data.zones[z];
+                    zone = data.zones[z].name;
                     cell = row.insertCell(z + 1);
                     result = data.getResultByZone(item, zone);
                     if (result === null) {
-                        addClass(cell, "not-applicable") //Item does not apply
-                        cell.innerHTML = ""; 
+                        addClass(cell, "not-applicable"); //Item does not apply
+                        //cell.innerHTML = "not applicable"; 
                     } else {
                         status = result.status || "status-not-found";
-                        cell.innerHTML = status;
+                        //cell.innerHTML = status;
                         addClass(cell, status);
+                        addClass(cell, "has-details");
                         cell.itemID = item.ID;
                         cell.zone = result.zone;
                         cell.addEventListener("click", view.ZoneTab.onResultClick);
@@ -131,6 +144,11 @@ var view = {
         onResultClick: function(event)  {
             localStorage.setItem("selectedItemID", event.target.itemID);
             localStorage.setItem("selectedZone", event.target.zone);
+            view.Detail.showSelected();
+        },
+        onZoneClick: function(event) {
+            localStorage.setItem("selectedItemID", "");
+            localStorage.setItem("selectedZone", event.target.id);
             view.Detail.showSelected();
         }
     },
@@ -147,11 +165,14 @@ var view = {
         },
         setText: function(text) {
             view.Detail.textarea.innerHTML = text;
+            view.Detail.textarea.rows = text.split(/\r\n|\r|\n/).length;
+
+            show(view.Detail.textarea);
         },
         showSelected: function() {
             var itemID = localStorage.getItem("selectedItemID");
             var zone = localStorage.getItem("selectedZone");
-            if( itemID && zone ){
+            if( hasValue(itemID) && hasValue(zone) ){
                 var item = data.getItem(itemID),
                     result = data.getResultByZone(item, zone),
                     text = "",
@@ -165,9 +186,27 @@ var view = {
                     if(prop != "itemID")
                         text += "\n\t" + prop + ":\t" + result[prop];
                 }
-                view.Detail.textarea.innerHTML = text;
-                view.Detail.textarea.rows = text.split(/\r\n|\r|\n/).length;
-                show(view.Detail.textarea);
+                view.Detail.setText(text);
+            } 
+            else if(hasValue(zone)) {
+                var status = data.getZoneStatus(zone);
+                switch (status) {
+                    case 'online':
+                        view.Detail.setText(
+                            "Zone " + zone + " passed all checks and appears to be online");
+                        break;
+                    case 'degraded':
+                        view.Detail.setText(
+                            "Zone " + zone + " failed at least one check but appears to be online");
+                        break;
+                    case 'offline':
+                        view.Detail.setText(
+                            "Zone " + zone + " had an error in at least one check and may be offline");
+                        break;
+                    default:
+                        // code
+                }
+                
             }
         },
         reset: function() {

@@ -5,4 +5,4 @@ NEW	Web Config	Deployment file that configures crontab - add to and complete app
 VERIFY	Command Exec	Verify container checks on Solaris zones
 ONGOING	Tests		Create tests for results, web and any new features
 NEW	Web view	Collapsable tree view of items based on item ID - level0_level1_levelN_item - Status of collapsed items represented by parent
-NEW     Web view    If zone is not available make the zone header red
+BUG     Web view    Detail area not resizing on click event, only on page refresh

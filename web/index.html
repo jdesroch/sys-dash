@@ -19,24 +19,31 @@ NOTE: app.js is using localStorage to maintain selected item/zone results betwee
         display:block;
     }
     /* Test item result status */
-    .pass {
+    .has-details {
         cursor:help;
+    }
+    .pass {
         background-color:green;
-        color:green;
     }
     .fail {
-        cursor:help;
         background-color:brown;
-        color:brown;
     }
     .error {
-        cursor:help;
-        background-color:gray;
-        color:gray;
+        background-color:orange;
     }
     .not-applicable {
-        background-color:#cc;
+        background-color:grey;
     }
+    .online {
+        background-color:green;
+    }
+    .degraded {
+        background-color:#808000;
+    }
+    .offline {
+        background-color:brown;
+    }
+    
 </style>
 </head>
 <body onload="javascript:init()">

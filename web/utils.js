@@ -51,4 +51,9 @@ function insertHeaderCell(row, cellText, cellClass){
     cell.innerHTML = cellText;
     addClass(cellClass);
     row.appendChild(cell);
+    return cell;
+}
+
+function hasValue(variable){
+    return typeof(variable) !== "undefined" &&variable !== null && variable !== "";
 }

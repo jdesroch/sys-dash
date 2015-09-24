@@ -113,7 +113,10 @@ writeZones() {
     for zone in $ZONE_LIST;
     do
         listSeparator ","
-        append "\"$zone\""
+        startObj #zone
+        propertyValue name $zone
+        propertyValueLast status "`data_getZoneStatus $zone`"
+        endObj #zone
     done
     endList #zones
 }
