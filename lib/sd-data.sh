@@ -21,6 +21,12 @@ LASTRUN=f2
 RESULT=f3
 OUTPUT=f4
 
+# Zone status values
+# May apply to functional components in future
+ONLINE="online"
+DEGRADED="degraded"
+OFFLINE="offline"
+
 # API Functions
 # validateZoneItemArgs <zone> <item>
 validateZoneItemArgs(){
@@ -36,7 +42,7 @@ data_getFile(){
     touch $DATA_DIR/$1"-"$2
     echo $DATA_DIR/$1"-"$2
 }
-# data_getValue <zone> <item> <dataField>
+# data_getValue <zone> <item> [<dataField>]
 data_getValue(){
     validateZoneItemArgs $1 $2
     if [ $# -eq 3 ]
@@ -47,6 +53,7 @@ data_getValue(){
         echo `tail -1 $data_file`
     fi
 }
+#data_getValues
 data_getValues(){
     for item in $ITEM_LIST
     do
@@ -56,6 +63,36 @@ data_getValues(){
         done
     done
 }
+
+# Aggregate status of a zone given the items inlcuded
+# data_getZoneStatus <zone>
+data_getZoneStatus() {
+    zone=$1
+    zStatus=$ONLINE
+    for item in $ITEM_LIST
+    do
+        # Item is applicable
+        grep $zone $(item_zones $item) >/dev/null 2>&1
+        if [ $? -ne 0 ]
+        then
+            iStatus=$(data_getValue $zone $item $RESULT)
+            case $iStatus in
+                "pass") # No channge
+                    ;;
+                "fail") 
+                    if [ "$zStatus" = "$ONLINE" ] ; then
+                        zStatus=$DEGRADED
+                    fi
+                    ;;
+                "error")
+                    zStatus=$OFFLINE
+                    ;;
+            esac
+        fi
+    done
+    echo $zStatus
+}
+
 # data_clear <zone> <item>
 data_clear(){
     validateZoneItemArgs $1 $2
