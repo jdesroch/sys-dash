@@ -113,7 +113,8 @@ var view = {
                     cell = row.insertCell(z + 1);
                     result = data.getResultByZone(item, zone);
                     if (result === null) {
-                        cell.innerHTML = "N/A";
+                        addClass(cell, "not-applicable") //Item does not apply
+                        cell.innerHTML = ""; 
                     } else {
                         status = result.status || "status-not-found";
                         cell.innerHTML = status;
