@@ -54,13 +54,12 @@
     
     /******* Content ********/
     zones table{
-        /* border: 1px solid black; */
         table-layout: fixed;
         width: 600px;
     }
 
     #zones th {
-        border: 1px solid black;
+        /*border: 1px solid black;*/
         overflow: hidden;
         width: 150px;
     }
