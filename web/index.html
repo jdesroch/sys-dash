@@ -42,6 +42,15 @@ NOTE: app.js is using localStorage to maintain selected item/zone results betwee
     }
     .offline {
         background-color:brown;
+    } /******* Content ********/
+    table{
+        table-layout: fixed;
+        width: 600px;
+    }
+    th {
+        /*border: 1px solid black;*/
+        overflow: hidden;
+        width: 150px;
     }
 </style>
 </head>
@@ -68,7 +77,6 @@ NOTE: app.js is using localStorage to maintain selected item/zone results betwee
 </div>
 <script src="utils.js"></script>
 <script src="data/sys-data.js"></script>
-<script src="CollapsibleTables.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -51,15 +51,3 @@
         display: inline-block;
         margin-right: -4px;
     }
-    
-    /******* Content ********/
-    zones table{
-        table-layout: fixed;
-        width: 600px;
-    }
-
-    th {
-        /*border: 1px solid black;*/
-        overflow: hidden;
-        width: 150px;
-    }

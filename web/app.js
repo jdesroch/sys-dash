@@ -141,18 +141,25 @@ var view = {
             view.OverviewTab.root.appendChild(itemTableDiv);
             
             // Initially all items are shown
-            view.appendItemTable(itemTableDiv, data.items);
-            
+            var selectedTag = localStorage.getItem("selectedTag");
+            if(selectedTag){
+                tagselector.value = selectedTag;
+                view.OverviewTab.onChangeTag();
+            } else {
+                view.appendItemTable(itemTableDiv, data.items);
+            }
         },
         // Filter items shown in table
         onChangeTag: function(){
             var selectedTag = document.getElementById("tagselector").value;
             var itemTableDiv = document.getElementById("itemTableDiv");
             itemTableDiv.innerHTML = "";
-            if(selectedTag === data.ALL_ITEMS)
+            if(selectedTag === data.ALL_ITEMS){
                 view.appendItemTable(itemTableDiv, data.items);
-            else
+            } else {
                 view.appendItemTable(itemTableDiv, data.getItemsByTag(selectedTag));
+            }
+            localStorage.setItem("selectedTag", selectedTag);
         }
     },
     /**
