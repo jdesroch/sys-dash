@@ -36,22 +36,19 @@ osgd_tty_check() {
     # Run commands using "xc <zone> <command>"
     # to check status of the given container/zone
     
-    xc $zone "ls -l /dev/tty" | grep "crw-rw-rw" > /dev/null
+    item_xc $zone "ls -l /dev/tty" | grep "crw-rw-rw" > /dev/null
     if [ $? -ne 0 ]
     then
-        echo "Incorrect permissions\n`ls -l /dev/tty`"
-        return 2
+        item_fail "Incorrect permissions\n\t`ls -l /dev/tty`"
     fi
     
-    xc $zone "ls -l /dev/tty" | grep "root tty" > /dev/null
+    item_xc $zone "ls -l /dev/tty" | grep "root tty" > /dev/null
       if [ $? -ne 0 ]
     then
-        echo "Incorrect owners\n`ls -l /dev/tty`"
-        return 2
+        item_fail "Incorrect owners\n\t`ls -l /dev/tty`"
     fi
 
-    echo "Permissions and owner are correct"
-    return 0
+    item_pass "Permissions and owner are correct\n\t`ls -l /dev/tty`"
 }
 
 osgd_tty_description() {

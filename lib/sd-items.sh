@@ -10,17 +10,17 @@ if [ -z "$ITEM_DIR" ]; then
 fi
 
 # Execution within a container (Zone, LXC, etc.)
-# The 'xc' function should be used within items' check method
+# The 'item_xc' function should be used within items' check method
 # 'global' container represents the host OS (Solaris global zone)
 HOST=global
 kernel=$(uname -s)
 # isStarted <zone>
 isStarted() {
-    xc $1 ls > /dev/null 2>&1
+    item_xc $1 ls > /dev/null 2>&1
     return $?
 }
-#xc <zone> <command>
-xc() {
+#item_xc <zone> <command>
+item_xc() {
     zone=$1; shift
     command=$@
     if [ "$zone" = "$HOST" ]
@@ -37,6 +37,24 @@ xc() {
         esac
         
     fi
+}
+
+# Convert newlines for item output
+#item_out <output of item>
+item_out() {
+    echo "$@" | sed ':a;N;$!ba;s/\n/\\n/g'
+}
+
+#item_pass <output of item>
+item_pass() {
+    item_out "$@"
+    return 0;
+}
+
+#item_pass <output of item>
+item_fail() {
+    item_out "$@"
+    return 2;
 }
 
 item_isValid() {

@@ -37,15 +37,13 @@ disk_usage_fail_check() {
     # Run commands using "xc <zone> <command>"
     # to check status of the given container/zone
     
-    CNT=$(xc $zone df -h | egrep '100%|[5-9][0-9]%' | wc -l)
+    CNT=$(item_xc $zone df -h | egrep '100%|[5-9][0-9]%' | wc -l)
 
     if [ $CNT -gt 0 ]
     then
-        echo $"File System(s) above 50% :\n`df -h | egrep '100%|[5-9][0-9]%'`"
-        return 2
+        item_fail "File System(s) above 50% :\n`df -h | egrep '100%|[5-9][0-9]%'`"
     else
-        echo "All file systems are below 50%"
-        return 0
+        item_pass "All file systems are below 50%"
     fi
     
     ######################################

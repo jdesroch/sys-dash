@@ -39,19 +39,15 @@ application_fake_file_check() {
     # Run commands using "xc <zone> <command>"
     # to check status of the given container/zone
     
-    CNT=$(xc $zone ls / | grep test_application | wc -l)
+    CNT=$(item_xc $zone ls / | grep test_application | wc -l)
 log_trace "CNT=$CNT"
-    res=$?
-log_trace "res=$res"
     
     # Echo useful output and return 0 or 2
     if [ $CNT -ge 1 ]
     then
-        echo "Fake app file is there!!!"
-        return 0
+        item_pass "Fake app file is there!!!"
     else
-        echo "test_application file not found"
-        return 2
+        item_fail "test_application file not found"
     fi
 }
 

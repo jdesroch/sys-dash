@@ -1,8 +1,8 @@
 ######################################
 #
-#   System Check: <item_name>
-#   Author: <creator>
-#   Created: <date>
+#   System Check: long_running_check
+#   Author: jody
+#   Created: 20151007
 #
 #   Date    Change
 #   ----    ------
@@ -10,23 +10,23 @@
 #
 ######################################
 
-<item_name>_title() {
-    echo "<item_name>"
+long_running_check_title() {
+    echo "Long running check"
 }
 
 # Non-negative integer of how much history is kept
-<item_name>_historySize() {
+long_running_check_historySize() {
     echo 0
 }
 
 # Space separated list of local zones (Solaris VMs) that should pass this check
-<item_name>_zones() {
-    echo "global"
+long_running_check_zones() {
+    echo "global ngz2"
 }
 
 # Space separated list of tags to be used for organizing item views
-<item_name>_tags() {
-    echo "new"
+long_running_check_tags() {
+    echo "new jody edge-case"
 }
 
 # Run checks and validate results
@@ -38,48 +38,48 @@
 # Send newline-safe output and the appropriate return value
 #   item_pass <output>
 #   item_fail <output>
-<item_name>_check() {
+long_running_check_check() {
     # Zone/container to be checked
     zone=$1
     # *DO NOT* make changes to the system
 
     #TODO Example
-    #RES=$(item_xc $zone <cammand>)
-    #
-    #if [ $? -gt 0 ]
-    #then
-    #   item_fail "Custom failure description - \n$RES"
-    #else
-    #   item_pass "Custom passing description - \n$RES"
-    #fi
+    RES=$(item_xc $zone ls -l /)
+
+    if [ $? -gt 0 ]
+    then
+       item_fail "Custom failure description - \n$RES"
+    else
+       item_pass "Custom passing description - \n$RES"
+    fi
 }
 
-<item_name>_description() {
+long_running_check_description() {
     echo "TODO: What is being checked"
 }
 
 # Commands that are run during check
 # Help admins reproduce the output
-<item_name>_commands() {
+long_running_check_commands() {
     echo "TODO: Commands that are run"
 }
 
 # Problems that may occur in the output
-<item_name>_indicators() {
+long_running_check_indicators() {
     echo "TODO: What to check for in output"    
 }
 
 # Potential fix actions
-<item_name>_fixMethod() {
+long_running_check_fixMethod() {
     echo "TODO:..."
 }
 
-<item_name>_hasAutoFix() {
+long_running_check_hasAutoFix() {
     #TODO if possible define and return 0
     return 1
 }
 
-<item_name>_autoFix() {
+long_running_check_autoFix() {
     #TODO if possible define and remove return 1
     return 1
 }
