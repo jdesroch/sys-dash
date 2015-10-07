@@ -58,7 +58,7 @@
         width: 600px;
     }
 
-    #zones th {
+    th {
         /*border: 1px solid black;*/
         overflow: hidden;
         width: 150px;

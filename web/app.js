@@ -5,10 +5,11 @@ var init = function(){
 
 var data = {
     Result: {
-        PASS: 1,
-        FAIL: 2,
-        ERROR: 3
+        PASS: "pass",
+        FAIL: "fail",
+        ERROR: "error"
     },
+    ALL_ITEMS: "All Items",
     init: function() {
         data.items = sysdata.items || [];
         data.results = sysdata.results || [];
@@ -16,7 +17,7 @@ var data = {
         data.tags = sysdata.tags || [];
     },
     getItem: function(ID){
-         var i, ilen = data.items.length, item;
+        var i, ilen = data.items.length, item;
         for(i=0;i<ilen;i++){
             item = data.items[i];
             if(item.ID === ID){
@@ -24,6 +25,13 @@ var data = {
             }
         }
         return null;
+    },
+    getItemNameSpaces: function(item){
+        var names = item.ID.split('_'), namespaces = {};
+        for(var i=0; i<names.length; i++){
+            namespaces.push(
+                i > 0 ? names[i-1] + "_" + names[i] :   names[i]);
+        }
     },
     getItemsByTag: function(tag){
         var i, ilen = data.items.length, item, tagItems = [];
@@ -33,7 +41,24 @@ var data = {
                 tagItems.push(item);
             }
         }
-        return taItems;
+        return tagItems;
+    },
+    getAggregateStatus: function(items, zone){
+        var i, ilen = items.length, status="pass";
+        for (i=0; i<ilen; i++){
+            switch(data.getResultByZone(items[i], zone)) {
+                case "fail":
+                    status="fail";
+                    break;
+                case "error":
+                    return "error";
+                default:
+            }
+        }
+        return status;
+    },
+    getTagStatus: function(tag, zone){
+        return data.getAggregateStatus(data.getItemsByTag(tag), zone);
     },
     getResultByZone: function(item, zoneName) {
         var r, rlen = data.results.length, result;
@@ -56,13 +81,12 @@ var data = {
 
 var view = {
     Nav: {
-        defaultLink: document.getElementById("nav-zones"),
+        defaultLink: document.getElementById("nav-overview"),
         getTab: function(link) {
             return document.getElementById(link.id.replace("nav-", ""));
         },
         select: function(selectedLink) {
-            var i, len = view.Nav.links.length,
-                link;
+            var i, len = view.Nav.links.length, link;
             for (i = 0; i < len; i++) {
                 link = view.Nav.links[i];
                 if (link == selectedLink) {
@@ -74,6 +98,8 @@ var view = {
                 }
             }
             view.Detail.reset();
+            // Store across browser refreshes
+            localStorage.setItem("selectedNavLink", selectedLink.id);
         },
         init: function() {
             view.Nav.root = document.getElementById("main-nav");
@@ -81,82 +107,78 @@ var view = {
             view.Nav.root.addEventListener("click", function(event) {
                 view.Nav.select(event.target);
             }, true);
-            
-            view.Nav.select(view.Nav.defaultLink);
+                
+                // TODO: Select anchor element...
+            var selectedLink = document.getElementById(localStorage.getItem("selectedNavLink"));
+            view.Nav.select(selectedLink || view.Nav.defaultLink);
         }
     },
     OverviewTab: {
         root: document.getElementById("overview"),
         init: function(){
-            view.OverviewTab.root.innerHTML = "TEST CONTENT";
+            view.OverviewTab.root.innerHTML = "";
+            view.OverviewTab.root.appendChild(document.createElement("br"));
+            // Tag filter
+            var tagselector = document.createElement("select");
+            tagselector.id = "tagselector";
+            var tlen = data.tags.length, t, option;
+            option = document.createElement("option");
+            option.value = data.ALL_ITEMS;
+            option.innerHTML = data.ALL_ITEMS;
+            tagselector.appendChild(option);
+            for(t=0;t<tlen; t++){
+                option = document.createElement("option");
+                option.value = data.tags[t];
+                option.innerHTML = data.tags[t];
+                tagselector.appendChild(option);
+            }
+            view.OverviewTab.root.appendChild(tagselector);
+            tagselector.addEventListener("change", view.OverviewTab.onChangeTag);
+            view.OverviewTab.root.appendChild(document.createElement("br"));
+            
+            var itemTableDiv = document.createElement("div");
+            itemTableDiv.id = "itemTableDiv";
+            view.OverviewTab.root.appendChild(itemTableDiv);
+            
+            // Initially all items are shown
+            view.appendItemTable(itemTableDiv, data.items);
+            
+        },
+        // Filter items shown in table
+        onChangeTag: function(){
+            var selectedTag = document.getElementById("tagselector").value;
+            var itemTableDiv = document.getElementById("itemTableDiv");
+            itemTableDiv.innerHTML = "";
+            if(selectedTag === data.ALL_ITEMS)
+                view.appendItemTable(itemTableDiv, data.items);
+            else
+                view.appendItemTable(itemTableDiv, data.getItemsByTag(selectedTag));
         }
     },
+    /**
     ZoneTab : {
         root: document.getElementById("zones"),
         init: function() {
             view.ZoneTab.root.innerHTML = "";
             view.ZoneTab.root.appendChild(document.createElement("br"));
-            
-            var table = document.createElement('table');
-    
-            // Header is list of zones
-            var header = table.createTHead();
-            var hrow = header.insertRow(0);
-            insertHeaderCell(hrow, "Item Name", "header");
-            var z, zlen = data.zones.length,
-                zone, zoneCells = [];
-            for (z = 0; z < zlen; z++) {
-                zone = data.zones[z];
-                zheader = insertHeaderCell(hrow, zone.name, "header");
-                zheader.id = zone.name;
-                addClass(zheader, zone.status);
-                addClass(zheader, "has-details");
-                zheader.addEventListener("click", view.ZoneTab.onZoneClick);
-            }
-            // One row per item
-            var i, ilen = data.items.length,
-                item, row, cell, result, status;
-            for (i = 0; i < ilen; i++) {
-                item = data.items[i];
-                row = table.insertRow(i + 1);
-                row.insertCell(0).innerHTML = item.title;
-                for (z = 0; z < zlen; z++) {
-                    zone = data.zones[z].name;
-                    cell = row.insertCell(z + 1);
-                    result = data.getResultByZone(item, zone);
-                    if (result === null) {
-                        addClass(cell, "not-applicable"); //Item does not apply
-                        //cell.innerHTML = "not applicable"; 
-                    } else {
-                        status = result.status || "status-not-found";
-                        //cell.innerHTML = status;
-                        addClass(cell, status);
-                        addClass(cell, "has-details");
-                        cell.itemID = item.ID;
-                        cell.zone = result.zone;
-                        cell.addEventListener("click", view.ZoneTab.onResultClick);
-                    }
-                }
-            }
-            view.ZoneTab.root.appendChild(table);
-            
-        },
-        onResultClick: function(event)  {
-            localStorage.setItem("selectedItemID", event.target.itemID);
-            localStorage.setItem("selectedZone", event.target.zone);
-            view.Detail.showSelected();
-        },
-        onZoneClick: function(event) {
-            localStorage.setItem("selectedItemID", "");
-            localStorage.setItem("selectedZone", event.target.id);
-            view.Detail.showSelected();
+            view.appendItemTable(view.ZoneTab.root, data.items);
         }
     },
     FunctionalTab: {
         root: document.getElementById("functions"),
         init: function(){
-            view.FunctionalTab.root.innerHTML = "TEST CONTENT";}
+            view.FunctionalTab.root.innerHTML = "";
+            view.FunctionalTab.root.appendChild(document.createElement("br"));
+            var t, tlen = data.tags, tagHeader;
+            for(t=0; t<tlen; t++){
+                tagHeader = document.createElement("h2");
+                tagHeader.innerHTML(data.tags[t]);
+                view.FunctionalTab.root.appendChild(tagHeader);
+                view.appendItemTable(view.FunctionalTab.root, data.getItemsByTag(data.tags[t]));
+            }
+        }
     },
+    **/
     Detail: {
         textarea: document.getElementById("detail-text-area"),
         init: function() {
@@ -214,9 +236,64 @@ var view = {
             hide(view.Detail.textarea);
         }
     },
+    appendItemTable: function(parentElement, items) {
+             
+            var table = document.createElement('table');
+    
+            // Header list of zones starting a 2nd cell
+            var header = table.createTHead();
+            var hrow = header.insertRow(0);
+            insertHeaderCell(hrow, "Item Name", "header");
+            var z, zlen = data.zones.length,
+                zone, zoneCells = [];
+            for (z = 0; z < zlen; z++) {
+                zone = data.zones[z];
+                zheader = insertHeaderCell(hrow, zone.name, "header");
+                zheader.id = zone.name;
+                addClass(zheader, zone.status);
+                addClass(zheader, "has-details");
+                zheader.addEventListener("click", view.onZoneClick);
+            }
+            // One row per item
+            var i, ilen = items.length,
+                item, row, cell, result, status;
+            for (i = 0; i < ilen; i++) {
+                item = items[i];
+                row = table.insertRow(i + 1);
+                row.insertCell(0).innerHTML = item.title;
+                for (z = 0; z < zlen; z++) {
+                    zone = data.zones[z].name;
+                    cell = row.insertCell(z + 1);
+                    result = data.getResultByZone(item, zone);
+                    if (result === null) {
+                        addClass(cell, "not-applicable"); //Item does not apply
+                        //cell.innerHTML = "not applicable"; 
+                    } else {
+                        status = result.status || "status-not-found";
+                        //cell.innerHTML = status;
+                        addClass(cell, status);
+                        addClass(cell, "has-details");
+                        cell.itemID = item.ID;
+                        cell.zone = result.zone;
+                        cell.addEventListener("click", view.onResultClick);
+                    }
+                }
+            }
+            parentElement.appendChild(table);
+    },
+    onResultClick: function(event)  {
+        localStorage.setItem("selectedItemID", event.target.itemID);
+        localStorage.setItem("selectedZone", event.target.zone);
+        view.Detail.showSelected();
+    },
+    onZoneClick: function(event) {
+        localStorage.setItem("selectedItemID", "");
+        localStorage.setItem("selectedZone", event.target.id);
+        view.Detail.showSelected();
+    },
     init: function() {
         for(var widget in view){
-            if(widget != "init")
+            if(view[widget].init)
                 view[widget].init();
         }
     }
