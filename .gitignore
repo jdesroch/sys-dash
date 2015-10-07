@@ -4,3 +4,4 @@ test/log*
 test/results
 web/data/*
 web/test
+web/CollapsibleTables.js
