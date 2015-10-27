@@ -42,7 +42,9 @@ item_xc() {
 # Convert newlines for item output
 #item_out <output of item>
 item_out() {
-    echo "$@" | sed ':a;N;$!ba;s/\n/\\n/g'
+    # sed expression broken up for solaris compatibilty
+    # http://stackoverflow.com/questions/22189809/sed-command-to-replace-newline-character-is-not-working-in-solaris-but-working-i
+    echo "$@" | sed -e ':a' -e 'N;$!ba' -e 's/\n/\\n/g'
 }
 
 #item_pass <output of item>
