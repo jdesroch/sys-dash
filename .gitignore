@@ -1,7 +1,7 @@
-log/*
-data/*
-test/log*
-test/results
-web/data/*
-web/test
+log/
+data/
+test/log/
+test/results/
+web/data/
+web/test/
 web/CollapsibleTables.js
