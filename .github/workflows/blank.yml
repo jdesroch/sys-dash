@@ -13,6 +13,5 @@ jobs:
       run: echo Hello, world!
     - name: Run a multi-line script
       run: |
-        echo Locate yo self!
-        pwd
-        find / -name Scripts -type d
+        echo Run updateAll
+        /home/runner/work/sys-dash/sys-dash/Scripts/results.sh updateAll && ls -R
